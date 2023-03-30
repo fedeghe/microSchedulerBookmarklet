@@ -1,0 +1,16 @@
+{
+    "name": "schedule",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "dependencies": {
+        "@fedeghe/countdown": "^0.0.12"
+    },
+    "devDependencies": {
+        "parcel-bundler": "^1.12.5"
+    },
+    "scripts": {
+        "build": "parcel build source/index.js",
+        "dev": "parcel --no-hmr watch source/index.js"
+    }
+}
