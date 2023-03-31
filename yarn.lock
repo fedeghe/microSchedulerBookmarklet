@@ -3498,6 +3498,16 @@ magic-string@^0.22.4:
   dependencies:
     vlq "^0.2.2"
 
+malta-js-bookmarklet@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/malta-js-bookmarklet/-/malta-js-bookmarklet-1.0.12.tgz#ca064a0496784cc44b54204c5a010d9940bddf05"
+  integrity sha512-vRIyO/OHSrZeBgmSS3W5b9HPiQUTwYMclsyfV+XcsXbyLvwLyugA2RWgvCWVvsYp18aP0Qy5KhKdR3zBgDKNtA==
+
+malta@^4.1.36:
+  version "4.1.36"
+  resolved "https://registry.yarnpkg.com/malta/-/malta-4.1.36.tgz#a701835147551f6d775eea151378c4c1e76dd081"
+  integrity sha512-YPgvojmSXx80UDQ8tYSwL7U+eJXSSbHMUFVYqQkngmnvNyU5iOKAP3RWMWjtSn1etujNSiWmGt3rI7IfMiglPg==
+
 map-cache@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/map-cache/-/map-cache-0.2.2.tgz#c32abd0bd6525d9b051645bb4f26ac5dc98a0dbf"

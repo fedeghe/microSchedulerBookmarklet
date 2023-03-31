@@ -7,10 +7,13 @@
         "@fedeghe/countdown": "^0.0.12"
     },
     "devDependencies": {
+        "malta": "^4.1.36",
+        "malta-js-bookmarklet": "^1.0.12",
         "parcel-bundler": "^1.12.5"
     },
     "scripts": {
         "build": "parcel build source/index.js",
-        "dev": "parcel --no-hmr watch source/index.js"
+        "dev": "parcel --no-hmr watch source/index.js",
+        "book": "malta source/bookmarklet.js . -plugins=malta-js-bookmarklet"
     }
 }
