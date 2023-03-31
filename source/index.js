@@ -23,14 +23,14 @@ const countdown = require('@fedeghe/countdown');
                 flexDirection: 'column',
                 alignItems: 'center'
             },
-            close: {
-                position:'absolute',
-                right:'10px',
-                top:'5px',
-                width:'10px',
-                height:'10px',
-                cursor:'pointer'
-            },
+            // close: {
+            //     position:'absolute',
+            //     right:'10px',
+            //     top:'5px',
+            //     width:'10px',
+            //     height:'10px',
+            //     cursor:'pointer'
+            // },
             plus: {
                 width:'20px',
                 height:'20px',
@@ -76,7 +76,7 @@ const countdown = require('@fedeghe/countdown');
         return t;
     }
     function schedule(config, setters, show, complete){
-        console.log(JSON.stringify(config, null, 2))
+        // console.log(JSON.stringify(config, null, 2))
         runSchedule(Object.entries(config), 0, setters, complete)
         show()
     }
@@ -109,7 +109,7 @@ const countdown = require('@fedeghe/countdown');
     (function(){
         var container = create('div', {style: styles.container}),
             fileInput = create('input', {attrs: {type:'file', name:'file', accept:'application/json'}}),
-            close = create('div', {style:styles.close}),
+            // close = create('div', {style:styles.close}),
             label = create('div', {style:styles.label}),
             progress = create('progress', {style:styles.progress, attrs:{value: 0, max:100}}),
             remaining = create('div', {style:styles.remaining});
@@ -138,13 +138,13 @@ const countdown = require('@fedeghe/countdown');
         }
         function setProgress(p){progress.setAttribute('value', p)}
         function setRemaining(r){remaining.innerHTML = r}
-        close.innerHTML='&times;';
+        // close.innerHTML='&times;';
         end.innerHTML='TIME OVER';
         rerun.innerHTML='↺';
         newrun.innerHTML='new';
-        close.addEventListener('click', function (){
-            target.removeChild(container);
-        });
+        // close.addEventListener('click', function (){
+        //     target.removeChild(container);
+        // });
         rerun.addEventListener('click', function _(){
             container.appendChild(label);
             container.appendChild(progress);
@@ -181,7 +181,7 @@ const countdown = require('@fedeghe/countdown');
             }
         });
         container.appendChild(fileInput);
-        container.appendChild(close);
+        // container.appendChild(close);
         target.appendChild(container);
     })();
 
