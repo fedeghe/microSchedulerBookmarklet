@@ -142,20 +142,26 @@ var countdown = require('@fedeghe/countdown');
         padding: '5px',
         backgroundColor: 'white',
         position: 'fixed',
-        // top:'-5px',
-        // right:'-5px',
-        top: 0,
-        right: 0,
-        width: '300px',
-        height: '50px',
-        border: '1px solid black',
+        top: '-5px',
+        right: '-5px',
+        paddingTop: '10px',
+        paddingRight: '20px',
+        // top:0,
+        // right:0,
+        // width:'300px',
+        // height:'50px',
+        border: '1px dashed #aaa',
         borderRadius: '5px',
-        opacity: '0.7'
+        opacity: '0.7',
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        alignItems: 'center'
       },
       close: {
         position: 'absolute',
-        right: 0,
-        top: 0,
+        right: '10px',
+        top: '5px',
         width: '10px',
         height: '10px',
         cursor: 'pointer'
@@ -168,9 +174,31 @@ var countdown = require('@fedeghe/countdown');
         color: 'red'
       },
       progress: {
-        accentColor: 'green'
+        accentColor: 'green',
+        height: '20px'
       },
-      remaining: {}
+      remaining: {
+        fontSize: '0.5em',
+        fontWeight: 'bold'
+      },
+      complete: {
+        fontWeight: 'bold'
+      },
+      newrun: {
+        fontSize: '0.8em',
+        color: 'green',
+        cursor: 'pointer'
+      },
+      rerun: {
+        fontSize: '1.4em',
+        lineHeight: '0.8em',
+        color: 'green',
+        cursor: 'pointer'
+      },
+      flash: {
+        filter: 'invert(100%)',
+        transition: 'filter .3s ease-in-out'
+      }
     },
     target = document.body;
   function sec2time(sec) {
@@ -198,7 +226,7 @@ var countdown = require('@fedeghe/countdown');
     var label = schedules[index][0],
       time = schedules[index][1];
     setters.label(label);
-    setters.progress(0);
+    setters.progress(1000);
     setters.remaining(sec2time(time * 60));
     countdown(function () {
       console.log(schedules.length, index + 1, schedules.length > index + 1);
@@ -212,8 +240,8 @@ var countdown = require('@fedeghe/countdown');
       var progress = _ref2.progress,
         remaining = _ref2.remaining;
       // console.log({progress, remaining})
-      setters.progress(progress);
-      setters.remaining(sec2time(remaining / 1000));
+      setters.progress(100 - progress);
+      setters.remaining(sec2time(Math.ceil(remaining / 1000)));
     }, 1e3).run();
   }
 
@@ -248,14 +276,20 @@ var countdown = require('@fedeghe/countdown');
     end = create('div', {
       style: styles.complete
     });
+    newrun = create('div', {
+      style: styles.newrun
+    });
     rerun = create('div', {
       style: styles.rerun
-    });
-    function show() {
+    }), memRun = function memRun() {};
+    function show(fi) {
+      console.log({
+        fi: fi
+      });
       container.appendChild(label);
       container.appendChild(progress);
       container.appendChild(remaining);
-      container.removeChild(fileInput);
+      if (!fi) container.removeChild(fileInput);
     }
     function complete() {
       container.removeChild(label);
@@ -263,6 +297,7 @@ var countdown = require('@fedeghe/countdown');
       container.removeChild(remaining);
       container.appendChild(end);
       container.appendChild(rerun);
+      container.appendChild(newrun);
     }
     function setLabel(l) {
       label.innerHTML = l;
@@ -275,14 +310,24 @@ var countdown = require('@fedeghe/countdown');
     }
     close.innerHTML = '&times;';
     end.innerHTML = 'TIME OVER';
-    rerun.innerHTML = 'run a new schedule';
+    rerun.innerHTML = '↺';
+    newrun.innerHTML = 'new';
     close.addEventListener('click', function () {
       target.removeChild(container);
     });
     rerun.addEventListener('click', function _() {
-      rerun.removeEventListener('click', _);
+      container.appendChild(label);
+      container.appendChild(progress);
+      container.appendChild(remaining);
       container.removeChild(end);
       container.removeChild(rerun);
+      container.removeChild(newrun);
+      memRun(true);
+    });
+    newrun.addEventListener('click', function _() {
+      container.removeChild(end);
+      container.removeChild(rerun);
+      container.removeChild(newrun);
       container.appendChild(fileInput);
     });
     fileInput.addEventListener('change', function (e) {
@@ -293,13 +338,19 @@ var countdown = require('@fedeghe/countdown');
 
         reader.addEventListener("load", function () {
           var j = JSON.parse(reader.result);
-          schedule(j, {
-            label: setLabel,
-            progress: setProgress,
-            remaining: setRemaining
-          }, show, complete);
+          memRun = function memRun(again) {
+            return schedule(j, {
+              label: setLabel,
+              progress: setProgress,
+              remaining: setRemaining
+            }, function () {
+              show(again);
+            }, complete);
+          };
+          memRun();
         }, false);
         reader.readAsText(file, "UTF-8");
+        e.target.value = '';
       }
     });
     container.appendChild(fileInput);
