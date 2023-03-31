@@ -1,6 +1,6 @@
-### Micro scheduler bookmarklet
+## Micro scheduler bookmarklet
 
-Want to run a meeting of an interview in perfect plan ?  
+Need to run a meeting or an interview in perfect timing ?  
 
 Just create a config json file as follows 
 
@@ -24,6 +24,10 @@ javascript:void%20function(){window.open('https%3A%2F%2Ffedeghe.github.io%2Fmicr
 ```
 and name it as u like.
 
-Now when the meeting starts, click the bookmarklet
+Now when the meeting starts, click the bookmarklet, select the right config json and 
 
-![Alt text](https://assets.digitalocean.com/articles/alligator/boo.svg "a title")
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_start.png "started")
+
+then when everything is over You have to option to rerun or run a new one
+
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_end.png "the end")
