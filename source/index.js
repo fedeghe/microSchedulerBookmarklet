@@ -15,7 +15,7 @@ const countdown = require('@fedeghe/countdown');
                 // right:0,
                 // width:'300px',
                 // height:'50px',
-                border:'1px dashed #aaa',
+                // border:'1px dashed #aaa',
                 borderRadius:'5px',
                 opacity:'0.7',
                 display:'flex',
