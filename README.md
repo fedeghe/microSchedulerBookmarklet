@@ -13,6 +13,10 @@ Just create a config json file as follows
     "mitigation": 2,
     "short term": 10,
     "long run": 3,
+    "questions": {
+        "#1": 5,
+        "#2": 5,
+    },
     "q&a": 30
 
 }
@@ -31,3 +35,6 @@ Now when the meeting starts, click the bookmarklet, select the right config json
 then when everything is over You have to option to rerun or run a new one
 
 ![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_end.png "the end")
+
+
+

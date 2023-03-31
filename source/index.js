@@ -67,6 +67,20 @@ const countdown = require('@fedeghe/countdown');
                 s = ~~ (sec % 60);
             return `${h}h ${m}m ${s}s`;
         },
+        makeFlat = function(j, key){
+            key = key || '';
+            const isObject = obj => obj != null && obj.constructor.name === "Object";
+            return Object.entries(j).reduce((acc, [k, v]) => {
+                const deep = isObject(v),
+                      innerK = (key ? key + ' ' : '') + k;
+                if (deep){
+                  acc = Object.assign({}, acc, makeFlat(v, innerK));
+                } else {
+                  acc[innerK] = v;
+                }
+                return acc;
+            }, {});
+        },
         remove = function(p, cs){cs.forEach(function(c){p.removeChild(c)})},
         append = function(p, cs){cs.forEach(function(c){p.appendChild(c)})},
         schedule = function(config, setters, show, complete){
@@ -100,7 +114,7 @@ const countdown = require('@fedeghe/countdown');
         },
         setLabel = function(l){label.innerHTML = l;},
         setProgress = function(p){progress.setAttribute('value', p)},
-        setRemaining = function(r){remaining.innerHTML = r}
+        setRemaining = function(r){remaining.innerHTML = r};
 
     end.innerHTML='TIME OVER';
     rerun.innerHTML='↺';
@@ -126,15 +140,16 @@ const countdown = require('@fedeghe/countdown');
                 
             reader.addEventListener("load", function () { 
                 try {
-                    var j = JSON.parse(reader.result);
-                    memRun = again => schedule(j, {
+                    var j = JSON.parse(reader.result),
+                        flatted = makeFlat(j);
+                    memRun = again => schedule(flatted, {
                         label: setLabel,
                         progress: setProgress,
                         remaining: setRemaining
                     }, function (){show(again);}, complete);
                     memRun();
                 } catch(e) {
-
+                    console.log(e)
                 }
             }, false);
             reader.readAsText(file, "UTF-8");
