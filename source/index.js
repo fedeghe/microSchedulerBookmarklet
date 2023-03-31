@@ -38,7 +38,7 @@ const countdown = require('@fedeghe/countdown');
             label:{color:'red'},
             progress:{accentColor:'green', height:'20px'},
             remaining:{
-                fontSize:'0.5em',
+                fontSize:'1em',
                 fontWeight: 'bold'
             },
             complete:{
