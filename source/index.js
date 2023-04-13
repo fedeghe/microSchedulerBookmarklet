@@ -65,7 +65,7 @@ const countdown = require('@fedeghe/countdown');
             if(style) for(s in style) t.style[s] = style[s];
             return t;
         },
-        auxTitles = ['turn sound on', 'turn sound off'],
+        auxTitles = ['turn beeps on', 'turn beeps off'],
         aux = create('div', {style: styles.aux}),
         auxTitle = create('div', {style: styles.auxTitle}),
         container = create('div', {style: styles.container}),
