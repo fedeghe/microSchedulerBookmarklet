@@ -72,7 +72,7 @@ const countdown = require('@fedeghe/countdown');
             const isObject = obj => obj != null && obj.constructor.name === "Object";
             return Object.entries(j).reduce((acc, [k, v]) => {
                 const deep = isObject(v),
-                      innerK = (key ? key + ' ' : '') + k;
+                      innerK = (key ? key + ' - ' : '') + k;
                 if (deep){
                   acc = Object.assign({}, acc, makeFlat(v, innerK));
                 } else {
