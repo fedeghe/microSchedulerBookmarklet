@@ -48,6 +48,12 @@ const countdown = require('@fedeghe/countdown');
                 lineHeight:'0.8em',
                 color:'green',
                 cursor: 'pointer'
+            },
+            auxTitle: {
+                display:'none',
+                position:'absolute',
+                left:0,
+                top:20
             }
         },
         auxActive = true,
@@ -58,8 +64,9 @@ const countdown = require('@fedeghe/countdown');
             if(style) for(s in style) t.style[s] = style[s];
             return t;
         },
-        auxTitle = ['turn sound on', 'turn sound off'],
+        auxTitles = ['turn sound on', 'turn sound off'],
         aux = create('div', {style: styles.aux}),
+        auxTitle = create('div', {style: styles.auxTitle}),
         container = create('div', {style: styles.container}),
         fileInput = create('input', {attrs: {type:'file', name:'file', accept:'application/json'}}),
         label = create('div', {style:styles.label}),
@@ -149,7 +156,7 @@ const countdown = require('@fedeghe/countdown');
     rerun.innerHTML='↺';
     newrun.innerHTML='new';
     aux.innerHTML='♪';
-    aux.setAttribute('title', auxTitle[1]);
+    auxTitle.innerHTML = auxTitles[1];
 
     rerun.addEventListener('click', function _(){
         append(container, [label, progress, remaining, aux]);
@@ -165,6 +172,12 @@ const countdown = require('@fedeghe/countdown');
         auxActive = !auxActive;
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
         aux.setAttribute('title', auxTitle[~~auxActive]);
+    });
+    aux.addEventListener('mouseover', function _(){
+        auxTitle.style.display = 'block'
+    });
+    aux.addEventListener('mouseleave', function _(){
+        auxTitle.style.display = 'none'
     });
 
     fileInput.addEventListener('change', function (e){
