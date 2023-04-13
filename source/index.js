@@ -52,8 +52,9 @@ const countdown = require('@fedeghe/countdown');
             auxTitle: {
                 display:'none',
                 position:'absolute',
-                left:0,
-                top:20
+                right:'30px',
+                top:'3px',
+                fontSize:'0.8em',
             }
         },
         auxActive = true,
@@ -139,13 +140,13 @@ const countdown = require('@fedeghe/countdown');
             },1e3).run()
         },
         show = function(fi){
-            append(container, [label, progress, remaining, aux]);
+            append(container, [label, progress, remaining, aux, auxTitle]);
             !fi && container.removeChild(fileInput);
         },
         complete = function(){
             beep(100, 800);
             setTimeout(function (){beep(100)}, 100)
-            remove(container, [label, progress, remaining, aux]);
+            remove(container, [label, progress, remaining, aux, auxTitle]);
             append(container, [end, rerun, newrun]);
         },
         setLabel = function(l){label.innerHTML = l;},
@@ -159,7 +160,7 @@ const countdown = require('@fedeghe/countdown');
     auxTitle.innerHTML = auxTitles[1];
 
     rerun.addEventListener('click', function _(){
-        append(container, [label, progress, remaining, aux]);
+        append(container, [label, progress, remaining, aux, auxTitle]);
         remove(container, [end, rerun, newrun]);
         memRun(true);
     });
@@ -169,14 +170,17 @@ const countdown = require('@fedeghe/countdown');
         container.appendChild(fileInput);
     });
     aux.addEventListener('click', function _(){
+        auxTitle.style.display = 'none'
         auxActive = !auxActive;
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
     });
     aux.addEventListener('mouseover', function _(){
-        auxTitle.style.display = 'block'
+        auxTitle.style.display = 'block';
+        auxTitle.innerHTML = auxTitles[1];
     });
     aux.addEventListener('mouseleave', function _(){
-        auxTitle.style.display = 'none'
+        auxTitle.style.display = 'none';
+        auxTitle.innerHTML = auxTitles[0];
     });
 
     fileInput.addEventListener('change', function (e){
