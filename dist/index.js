@@ -171,6 +171,15 @@ var countdown = require('@fedeghe/countdown');
         fontSize: '1em',
         fontWeight: 'bold'
       },
+      aux: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        height: '20px',
+        width: '20px',
+        cursor: 'pointer',
+        color: 'black'
+      },
       complete: {
         fontWeight: 'bold'
       },
@@ -184,12 +193,9 @@ var countdown = require('@fedeghe/countdown');
         lineHeight: '0.8em',
         color: 'green',
         cursor: 'pointer'
-      },
-      flash: {
-        filter: 'invert(100%)',
-        transition: 'filter .3s ease-in-out'
       }
     },
+    auxActive = true,
     target = document.body,
     create = function create(tag, _ref) {
       var _ref$attrs = _ref.attrs,
@@ -201,6 +207,9 @@ var countdown = require('@fedeghe/countdown');
       if (style) for (s in style) t.style[s] = style[s];
       return t;
     },
+    aux = create('div', {
+      style: styles.aux
+    }),
     container = create('div', {
       style: styles.container
     }),
@@ -274,6 +283,19 @@ var countdown = require('@fedeghe/countdown');
   }, schedule = function schedule(config, setters, show, complete) {
     runSchedule(Object.entries(config), 0, setters, complete);
     show();
+  }, beep = function beep(d, f) {
+    if (!auxActive) return;
+    d = d || 100;
+    f = f || 400;
+    var context = new AudioContext(),
+      oscillator = context.createOscillator();
+    oscillator.type = "sine";
+    oscillator.frequency.value = f;
+    oscillator.connect(context.destination);
+    oscillator.start();
+    setTimeout(function () {
+      oscillator.stop();
+    }, d);
   }, runSchedule = function (_runSchedule) {
     function runSchedule(_x4, _x5, _x6, _x7) {
       return _runSchedule.apply(this, arguments);
@@ -283,6 +305,7 @@ var countdown = require('@fedeghe/countdown');
     };
     return runSchedule;
   }(function (schedules, index, setters, complete) {
+    setTimeout(beep, 100);
     var label = schedules[index][0],
       time = schedules[index][1];
     setters.label(label);
@@ -297,10 +320,14 @@ var countdown = require('@fedeghe/countdown');
       setters.remaining(sec2time(Math.ceil(remaining / 1000)));
     }, 1e3).run();
   }), show = function show(fi) {
-    append(container, [label, progress, remaining]);
+    append(container, [label, progress, remaining, aux]);
     !fi && container.removeChild(fileInput);
   }, complete = function complete() {
-    remove(container, [label, progress, remaining]);
+    beep(100, 800);
+    setTimeout(function () {
+      beep(100);
+    }, 100);
+    remove(container, [label, progress, remaining, aux]);
     append(container, [end, rerun, newrun]);
   }, setLabel = function setLabel(l) {
     label.innerHTML = l;
@@ -312,14 +339,19 @@ var countdown = require('@fedeghe/countdown');
   end.innerHTML = 'TIME OVER';
   rerun.innerHTML = '↺';
   newrun.innerHTML = 'new';
+  aux.innerHTML = '♪';
   rerun.addEventListener('click', function _() {
-    append(container, [label, progress, remaining]);
+    append(container, [label, progress, remaining, aux]);
     remove(container, [end, rerun, newrun]);
     memRun(true);
   });
   newrun.addEventListener('click', function _() {
-    append(container, [end, rerun, newrun]);
+    remove(container, [end, rerun, newrun]);
     container.appendChild(fileInput);
+  });
+  aux.addEventListener('click', function _() {
+    auxActive = !auxActive;
+    aux.style.color = auxActive ? styles.aux.color : '#aaa';
   });
   fileInput.addEventListener('change', function (e) {
     var files = this.files,
