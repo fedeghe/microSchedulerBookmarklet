@@ -59,7 +59,7 @@ const countdown = require('@fedeghe/countdown');
             return t;
         },
         auxTitle = ['turn sound on', 'turn sound off'],
-        aux = create('div', {style: styles.aux, title: auxTitle[1]}),
+        aux = create('div', {style: styles.aux}),
         container = create('div', {style: styles.container}),
         fileInput = create('input', {attrs: {type:'file', name:'file', accept:'application/json'}}),
         label = create('div', {style:styles.label}),
@@ -149,6 +149,7 @@ const countdown = require('@fedeghe/countdown');
     rerun.innerHTML='↺';
     newrun.innerHTML='new';
     aux.innerHTML='♪';
+    aux.setAttribute('title', auxTitle[1]);
 
     rerun.addEventListener('click', function _(){
         append(container, [label, progress, remaining, aux]);
