@@ -173,14 +173,13 @@ const countdown = require('@fedeghe/countdown');
         auxTitle.style.display = 'none'
         auxActive = !auxActive;
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
+        auxTitle.innerHTML = auxTitles[~~auxActive];
     });
     aux.addEventListener('mouseover', function _(){
         auxTitle.style.display = 'block';
-        auxTitle.innerHTML = auxTitles[1];
     });
     aux.addEventListener('mouseleave', function _(){
         auxTitle.style.display = 'none';
-        auxTitle.innerHTML = auxTitles[0];
     });
 
     fileInput.addEventListener('change', function (e){
