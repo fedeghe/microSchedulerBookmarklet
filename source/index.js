@@ -122,6 +122,7 @@ const countdown = require('@fedeghe/countdown');
 
         runSchedule = function(schedules, index, setters, complete){
             setTimeout(beep, 100);
+            
             var label = schedules[index][0],
                 time = schedules[index][1];
             
@@ -174,12 +175,8 @@ const countdown = require('@fedeghe/countdown');
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
         auxTitle.innerHTML = auxTitles[~~auxActive];
     });
-    aux.addEventListener('mouseover', function _(){
-        auxTitle.style.display = 'block';
-    });
-    aux.addEventListener('mouseleave', function _(){
-        auxTitle.style.display = 'none';
-    });
+    aux.addEventListener('mouseover', function _(){ auxTitle.style.display = 'block'; });
+    aux.addEventListener('mouseleave', function _(){ auxTitle.style.display = 'none'; });
 
     fileInput.addEventListener('change', function (e){
         var files = this.files,
