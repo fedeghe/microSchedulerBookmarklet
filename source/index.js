@@ -118,7 +118,6 @@ const countdown = require('@fedeghe/countdown');
             setTimeout(function () {
                 oscillator.stop();
             }, d); 
-            
         },
 
         runSchedule = function(schedules, index, setters, complete){
@@ -145,7 +144,7 @@ const countdown = require('@fedeghe/countdown');
         },
         complete = function(){
             beep(100, 800);
-            setTimeout(function (){beep(100)}, 100)
+            setTimeout(beep, 100)
             remove(container, [label, progress, remaining, aux, auxTitle]);
             append(container, [end, rerun, newrun]);
         },
