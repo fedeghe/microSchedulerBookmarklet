@@ -22,7 +22,7 @@ const countdown = require('@fedeghe/countdown');
         label: { color: 'red' },
         progress: { accentColor: 'green', height: '20px' },
         progressG: {
-            accentColor: 'green',
+            accentColor: '#afa',
             height: '20px',
             width: '100%',
             position: 'absolute',
