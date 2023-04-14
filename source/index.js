@@ -79,8 +79,8 @@ const countdown = require('@fedeghe/countdown');
         container = create('div', { style: styles.container }),
         fileInput = create('input', { attrs: { type: 'file', name: 'file', accept: 'application/json' } }),
         label = create('div', { style: styles.label }),
-        progress = create('progress', { style: styles.progress, attrs: { value: 0, max: 100 } }),
-        progressG = create('progress', { style: styles.progressG, attrs: { value: 0, max: 100 } }),
+        progress = create('progress', { style: styles.progress, attrs: { value: 100, max: 100 } }),
+        progressG = create('progress', { style: styles.progressG, attrs: { value: 100, max: 100 } }),
         remaining = create('div', { style: styles.remaining });
 
     end = create('div', { style: styles.complete });
