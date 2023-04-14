@@ -32,7 +32,8 @@ Now when the meeting starts, click the bookmarklet, select the right config json
 
 ![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_start.png "started")
 
-then when everything is over You have to option to rerun or run a new one
+there one can see the overall progress in the upper left corner, the section progress and a `♪` icon to turn on/off the beeps that will be produced on each transition and at the end.   
+Then when everything is over You have to option to rerun or run a new one.
 
 ![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_end.png "the end")
 
