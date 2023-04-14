@@ -28,6 +28,7 @@ const countdown = require('@fedeghe/countdown');
             top: 0,
             left: 0,
             fontWeight:'bold',
+            fontSize:'0.7em',
             margin:'5px'
         },
         remaining: {
