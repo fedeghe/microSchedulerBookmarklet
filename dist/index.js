@@ -156,6 +156,19 @@ var countdown = require('@fedeghe/countdown');
         flexDirection: 'column',
         alignItems: 'center'
       },
+      title: {
+        fontWeight: 'bold',
+        textAlign: 'center',
+        paddingBottom: '10px'
+      },
+      file: {
+        cursor: 'pointer'
+      },
+      startButton: {
+        color: 'red',
+        cursor: 'pointer',
+        fontSize: '1.2em'
+      },
       plus: {
         width: '20px',
         height: '20px'
@@ -195,6 +208,7 @@ var countdown = require('@fedeghe/countdown');
         fontWeight: 'bold'
       },
       newrun: {
+        paddingTop: '5px',
         fontSize: '0.8em',
         color: 'green',
         cursor: 'pointer'
@@ -219,9 +233,11 @@ var countdown = require('@fedeghe/countdown');
       startSelection: 'selected file',
       full: '100%',
       auxActivate: 'turn beeps on',
-      auxDeactivate: 'turn beeps off'
+      auxDeactivate: 'turn beeps off',
+      end: 'TIME OVER'
     },
     auxActive = true,
+    configFileName = '',
     target = document.body,
     create = function create(tag, _ref) {
       var _ref$attrs = _ref.attrs,
@@ -233,21 +249,28 @@ var countdown = require('@fedeghe/countdown');
       if (style) for (s in style) t.style[s] = style[s];
       return t;
     },
+    container = create('div', {
+      style: styles.container
+    }),
+    title = create('div', {
+      style: styles.title
+    }),
+    fileInput = create('input', {
+      style: styles.file,
+      attrs: {
+        type: 'file',
+        name: 'file',
+        accept: '.json'
+      }
+    }),
+    start = create('button', {
+      style: styles.startButton
+    }),
     aux = create('div', {
       style: styles.aux
     }),
     auxTitle = create('div', {
       style: styles.auxTitle
-    }),
-    container = create('div', {
-      style: styles.container
-    }),
-    fileInput = create('input', {
-      attrs: {
-        type: 'file',
-        name: 'file',
-        accept: 'application/json'
-      }
     }),
     label = create('div', {
       style: styles.label
@@ -267,130 +290,137 @@ var countdown = require('@fedeghe/countdown');
     }),
     end = create('div', {
       style: styles.complete
-    });
-  newrun = create('div', {
-    style: styles.newrun
-  });
-  rerun = create('div', {
-    style: styles.rerun
-  }), memRun = function memRun() {}, total = 0, sec2time = function sec2time(sec) {
-    var h = ~~(sec / 3600),
-      m = ~~(sec % 3600 / 60),
-      s = ~~(sec % 60);
-    return "".concat(h, "h ").concat(m, "m ").concat(s, "s");
-  }, makeFlat = function (_makeFlat) {
-    function makeFlat(_x2, _x3) {
-      return _makeFlat.apply(this, arguments);
-    }
-    makeFlat.toString = function () {
-      return _makeFlat.toString();
-    };
-    return makeFlat;
-  }(function (j, key) {
-    key = key || '';
-    var isObject = function isObject(obj) {
-      return obj != null && obj.constructor.name === "Object";
-    };
-    return Object.entries(j).reduce(function (acc, _ref2) {
-      var _ref3 = _slicedToArray(_ref2, 2),
-        k = _ref3[0],
-        v = _ref3[1];
-      var deep = isObject(v),
-        innerK = (key ? key + ' - ' : '') + k;
-      if (deep) {
-        acc = Object.assign({}, acc, makeFlat(v, innerK));
-      } else {
-        total += v;
-        acc[innerK] = v;
+    }),
+    newrun = create('div', {
+      style: styles.newrun
+    }),
+    rerun = create('div', {
+      style: styles.rerun
+    }),
+    views = {
+      start: [title, fileInput],
+      ready: [title, start, newrun],
+      running: [label, progress, remaining, aux, auxTitle, progressLabel],
+      end: [end, rerun, newrun]
+    },
+    memRun = function memRun() {},
+    total = 0,
+    sec2time = function sec2time(sec) {
+      var h = ~~(sec / 3600),
+        m = ~~(sec % 3600 / 60),
+        s = ~~(sec % 60);
+      return "".concat(h, "h ").concat(m, "m ").concat(s, "s");
+    },
+    makeFlat = function makeFlat(j, key) {
+      key = key || '';
+      var isObject = function isObject(obj) {
+        return obj != null && obj.constructor.name === "Object";
+      };
+      return Object.entries(j).reduce(function (acc, _ref2) {
+        var _ref3 = _slicedToArray(_ref2, 2),
+          k = _ref3[0],
+          v = _ref3[1];
+        var deep = isObject(v),
+          innerK = (key ? key + ' - ' : '') + k;
+        if (deep) {
+          acc = Object.assign({}, acc, makeFlat(v, innerK));
+        } else {
+          total += v;
+          acc[innerK] = v;
+        }
+        return acc;
+      }, {});
+    },
+    schedule = function schedule(config, setters, show) {
+      runSchedule(Object.entries(config), 0, setters);
+      show();
+    },
+    beep = function beep(d, f) {
+      if (!auxActive) return;
+      d = d || 100;
+      f = f || 400;
+      var context = new AudioContext(),
+        oscillator = context.createOscillator();
+      oscillator.type = "sine";
+      oscillator.frequency.value = f;
+      oscillator.connect(context.destination);
+      oscillator.start();
+      setTimeout(function () {
+        oscillator.stop();
+      }, d);
+    },
+    beepn = function beepn(n) {
+      for (var i = 0; i < n; i++) {
+        setTimeout(beep, 100 * i + 10);
       }
-      return acc;
-    }, {});
-  }), remove = function remove(p, cs) {
-    cs = cs || Array.from(p.children);
-    cs.forEach(function (c) {
-      p.removeChild(c);
-    });
-  }, append = function append(p, cs) {
-    cs.forEach(function (c) {
-      p.appendChild(c);
-    });
-  }, schedule = function schedule(config, setters, show) {
-    runSchedule(Object.entries(config), 0, setters);
-    show();
-  }, beep = function beep(d, f) {
-    if (!auxActive) return;
-    d = d || 100;
-    f = f || 400;
-    var context = new AudioContext(),
-      oscillator = context.createOscillator();
-    oscillator.type = "sine";
-    oscillator.frequency.value = f;
-    oscillator.connect(context.destination);
-    oscillator.start();
-    setTimeout(function () {
-      oscillator.stop();
-    }, d);
-  }, beepn = function beepn(n) {
-    for (var i = 0; i < n; i++) {
-      setTimeout(beep, 100 * i + 10);
-    }
-  }, runSchedule = function (_runSchedule) {
-    function runSchedule(_x4, _x5, _x6) {
-      return _runSchedule.apply(this, arguments);
-    }
-    runSchedule.toString = function () {
-      return _runSchedule.toString();
-    };
-    return runSchedule;
-  }(function (schedules, index, setters) {
-    setTimeout(beep, 100);
-    // beepn(index + 1);
+    },
+    runSchedule = function runSchedule(schedules, index, setters) {
+      setTimeout(beep, 100);
+      // beepn(index + 1);
 
-    var label = schedules[index][0],
-      time = schedules[index][1];
-    setters.label(label);
-    setters.progress(1000);
-    setters.remaining(sec2time(time * 60));
-    countdown(function () {
-      schedules.length > index + 1 ? runSchedule(schedules, index + 1, setters) : complete();
-    }, time * 60e3).onTick(function (_ref4) {
-      var progress = _ref4.progress,
-        remaining = _ref4.remaining;
-      setters.progress(100 - progress);
-      setters.remaining(sec2time(Math.ceil(remaining / 1000)));
-    }, 1e3).run();
-  }), show = function show(fi) {
-    append(container, [label, progress, remaining, aux, auxTitle, progressLabel]);
-    !fi && container.removeChild(fileInput);
-  }, complete = function complete() {
-    beep(100, 800);
-    setTimeout(beep, 100);
-    render('end');
-  }, setLabel = function setLabel(l) {
-    label.innerHTML = l;
-  }, setProgress = function setProgress(p) {
-    progress.setAttribute('value', p);
-  }, setProgressLabel = function setProgressLabel(p) {
-    progressLabel.innerHTML = "".concat(p.toFixed(1), "%");
-  }, setRemaining = function setRemaining(r) {
-    remaining.innerHTML = r;
-  }, startGlobal = function startGlobal() {
-    progressLabel.innerHTML = labels.full;
-    countdown(function () {}, total * 60e3).onTick(function (_ref5) {
-      var progress = _ref5.progress;
-      setProgressLabel(100 - progress);
-    }, 1e3).run();
-  }, views = {
-    start: [fileInput],
-    running: [label, progress, remaining, aux, auxTitle, progressLabel],
-    end: [end, rerun, newrun]
-  }, render = function render(name) {
-    if (name in views) {
-      remove(container);
-      append(container, views[name]);
-    }
-  };
-  end.innerHTML = 'TIME OVER';
+      var label = schedules[index][0],
+        time = schedules[index][1];
+      setters.label(label);
+      setters.progress(1000);
+      setters.remaining(sec2time(time * 60));
+      countdown(function () {
+        schedules.length > index + 1 ? runSchedule(schedules, index + 1, setters) : complete();
+      }, time * 60e3).onTick(function (_ref4) {
+        var progress = _ref4.progress,
+          remaining = _ref4.remaining;
+        setters.progress(100 - progress);
+        setters.remaining(sec2time(Math.ceil(remaining / 1000)));
+      }, 1e3).run();
+    },
+    show = function show(fi) {
+      // append(container, [label, progress, remaining, aux, auxTitle, progressLabel]);
+      render('running');
+      !fi && container.removeChild(fileInput);
+    },
+    complete = function complete() {
+      beep(100, 800);
+      setTimeout(beep, 100);
+      render('end');
+    },
+    setLabel = function setLabel(l) {
+      label.innerHTML = l;
+    },
+    setProgress = function setProgress(p) {
+      progress.setAttribute('value', p);
+    },
+    setProgressLabel = function setProgressLabel(p) {
+      progressLabel.innerHTML = "".concat(p.toFixed(1), "%");
+    },
+    setRemaining = function setRemaining(r) {
+      remaining.innerHTML = r;
+    },
+    startGlobal = function startGlobal() {
+      progressLabel.innerHTML = labels.full;
+      countdown(function () {}, total * 60e3).onTick(function (_ref5) {
+        var progress = _ref5.progress;
+        setProgressLabel(100 - progress);
+      }, 1e3).run();
+    },
+    remove = function remove(p, cs) {
+      cs = cs || Array.from(p.children);
+      cs.forEach(function (c) {
+        p.removeChild(c);
+      });
+    },
+    append = function append(p, cs) {
+      cs.forEach(function (c) {
+        p.appendChild(c);
+      });
+    },
+    render = function render(name) {
+      if (name in views) {
+        remove(container);
+        append(container, views[name]);
+      }
+    };
+  title.innerHTML = labels.startTitle;
+  start.innerHTML = labels.startButton;
+  end.innerHTML = labels.end;
   rerun.innerHTML = '↺';
   newrun.innerHTML = 'new';
   aux.innerHTML = '♪';
@@ -415,6 +445,10 @@ var countdown = require('@fedeghe/countdown');
   aux.addEventListener('mouseleave', function _() {
     auxTitle.style.display = 'none';
   });
+  start.addEventListener('click', function _() {
+    startGlobal();
+    memRun();
+  });
   fileInput.addEventListener('change', function (e) {
     var files = this.files,
       file,
@@ -422,6 +456,7 @@ var countdown = require('@fedeghe/countdown');
     if (files.length) {
       file = files[0];
       reader = new FileReader();
+      configFileName = file.name;
       reader.addEventListener("load", function () {
         try {
           var j = JSON.parse(reader.result),
@@ -435,8 +470,7 @@ var countdown = require('@fedeghe/countdown');
               show(again);
             });
           };
-          memRun();
-          startGlobal();
+          render('ready');
         } catch (e) {
           console.log('ERROR: ', e);
         }
@@ -445,8 +479,8 @@ var countdown = require('@fedeghe/countdown');
       e.target.value = '';
     }
   });
-  container.appendChild(fileInput);
   target.appendChild(container);
+  render('start');
 })();
 },{"@fedeghe/countdown":"../node_modules/@fedeghe/countdown/dist/index.js"}]},{},["index.js"], null)
 //# sourceMappingURL=/index.js.map
