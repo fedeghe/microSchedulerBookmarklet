@@ -23,8 +23,8 @@ Just create a config json file as follows
 ```
 
 then create (just once) a bookmarklet containing the following: 
-```
-javascript:void%20function(){window.open('https%3A%2F%2Ffedeghe.github.io%2FmicroSchedulerBookmarklet%2Findex.html'%2C'Scheduler'%2C'width%3D300%2Cheight%3D100%2Cstatus%3D0%2Ctoolbar%3D0%2Cmenubar%3D0%2Cresizebar%3D0%2Cpopup%3D1%2Cnoopener%3D1%2Cnoreferrer%3D1')%3B}();
+``` 
+javascript:void%20function(){window.open('https%3A%2F%2Ffedeghe.github.io%2FmicroSchedulerBookmarklet%2F'%2C'Scheduler'%2C'width%3D300%2Cheight%3D100%2Cstatus%3D0%2Ctoolbar%3D0%2Cmenubar%3D0%2Clocation%3D0%2Cresizable%3D0%2Cpopup%3D1%2Cnoopener%3D1%2Cnoreferrer%3D1')%3B}();
 ```
 and name it as u like.
 
