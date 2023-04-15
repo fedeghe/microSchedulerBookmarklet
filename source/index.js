@@ -21,7 +21,7 @@ const countdown = require('@fedeghe/countdown');
             },
             label: { color: 'red' },
             progress: { accentColor: 'green', height: '20px' },
-            progressG: {
+            progressLabel: {
                 accentColor: '#afa',
                 height: '20px',
                 position: 'absolute',
@@ -68,6 +68,14 @@ const countdown = require('@fedeghe/countdown');
                 fontSize: '0.8em',
             }
         },
+        labels = {
+            startTitle: 'Scheduler',
+            startButton: 'start',
+            startSelection: 'selected file',
+            full: '100%',
+            auxActivate: 'turn beeps on',
+            auxDeactivate: 'turn beeps off',
+        },
         auxActive = true,
         target = document.body,
         create = function (tag, { attrs = null, style = null }) {
@@ -76,14 +84,15 @@ const countdown = require('@fedeghe/countdown');
             if (style) for (s in style) t.style[s] = style[s];
             return t;
         },
-        auxTitles = ['turn beeps on', 'turn beeps off'],
+    
+
         aux = create('div', { style: styles.aux }),
         auxTitle = create('div', { style: styles.auxTitle }),
         container = create('div', { style: styles.container }),
         fileInput = create('input', { attrs: { type: 'file', name: 'file', accept: 'application/json' } }),
         label = create('div', { style: styles.label }),
         progress = create('progress', { style: styles.progress, attrs: { value: 100, max: 100 } }),
-        progressG = create('div', { style: styles.progressG}),
+        progressLabel = create('div', { style: styles.progressLabel}),
         remaining = create('div', { style: styles.remaining }),
 
         end = create('div', { style: styles.complete });
@@ -164,7 +173,7 @@ const countdown = require('@fedeghe/countdown');
                 }, 1e3).run()
         },
         show = function (fi) {
-            append(container, [label, progress, remaining, aux, auxTitle, progressG]);
+            append(container, [label, progress, remaining, aux, auxTitle, progressLabel]);
             !fi && container.removeChild(fileInput);
         },
         complete = function () {
@@ -174,18 +183,19 @@ const countdown = require('@fedeghe/countdown');
         },
         setLabel = function (l) { label.innerHTML = l; },
         setProgress = function (p) { progress.setAttribute('value', p) },
-        setProgressG = function (p) { progressG.innerHTML = `${p.toFixed(1)}%` },
+        setProgressLabel = function (p) { progressLabel.innerHTML = `${p.toFixed(1)}%` },
         setRemaining = function (r) { remaining.innerHTML = r },
         startGlobal = function () {
-            progressG.innerHTML = '100.0%';
+            progressLabel.innerHTML = labels.full;
             countdown(() => {}, total * 60e3)
-            .onTick(({ progress }) => {
-                setProgressG(100 - progress)
-            }, 1e3).run()
+                .onTick(({ progress }) => {
+                    setProgressLabel(100 - progress)
+                }, 1e3)
+                .run()
         },
         views = {
             start: [fileInput],
-            running: [label, progress, remaining, aux, auxTitle, progressG],
+            running: [label, progress, remaining, aux, auxTitle, progressLabel],
             end: [end, rerun, newrun]
         },
         render = function (name){
@@ -199,7 +209,7 @@ const countdown = require('@fedeghe/countdown');
     rerun.innerHTML = '↺';
     newrun.innerHTML = 'new';
     aux.innerHTML = '♪';
-    auxTitle.innerHTML = auxTitles[1];
+    auxTitle.innerHTML = labels.auxDeactivate;
 
     rerun.addEventListener('click', function _() {
         render('running')
@@ -213,7 +223,7 @@ const countdown = require('@fedeghe/countdown');
         auxTitle.style.display = 'none'
         auxActive = !auxActive;
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
-        auxTitle.innerHTML = auxTitles[~~auxActive];
+        auxTitle.innerHTML = labels[auxActive ? 'auxDeactivate' : 'auxActivate'];
     });
     aux.addEventListener('mouseover', function _() { auxTitle.style.display = 'block'; });
     aux.addEventListener('mouseleave', function _() { auxTitle.style.display = 'none'; });
