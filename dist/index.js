@@ -162,7 +162,11 @@ var countdown = require('@fedeghe/countdown');
         paddingBottom: '10px'
       },
       file: {
-        cursor: 'pointer'
+        display: 'none'
+      },
+      fileLabel: {
+        cursor: 'pointer',
+        color: 'blue'
       },
       startButton: {
         color: 'red',
@@ -234,7 +238,8 @@ var countdown = require('@fedeghe/countdown');
       full: '100%',
       auxActivate: 'turn beeps on',
       auxDeactivate: 'turn beeps off',
-      end: 'TIME OVER'
+      end: 'TIME OVER',
+      chooseFile: 'choose a configuration file'
     },
     auxActive = true,
     configFileName = '',
@@ -262,6 +267,9 @@ var countdown = require('@fedeghe/countdown');
         name: 'file',
         accept: '.json'
       }
+    }),
+    fileLabel = create('div', {
+      style: styles.fileLabel
     }),
     start = create('button', {
       style: styles.startButton
@@ -298,7 +306,7 @@ var countdown = require('@fedeghe/countdown');
       style: styles.rerun
     }),
     views = {
-      start: [title, fileInput],
+      start: [title, fileInput, fileLabel],
       ready: [title, start, newrun],
       running: [label, progress, remaining, aux, auxTitle, progressLabel],
       end: [end, rerun, newrun]
@@ -420,6 +428,7 @@ var countdown = require('@fedeghe/countdown');
     };
   title.innerHTML = labels.startTitle;
   start.innerHTML = labels.startButton;
+  fileLabel.innerHTML = labels.chooseFile;
   end.innerHTML = labels.end;
   rerun.innerHTML = '↺';
   newrun.innerHTML = 'new';
@@ -448,6 +457,9 @@ var countdown = require('@fedeghe/countdown');
   start.addEventListener('click', function _() {
     startGlobal();
     memRun();
+  });
+  fileLabel.addEventListener('click', function () {
+    fileInput.click();
   });
   fileInput.addEventListener('change', function (e) {
     var files = this.files,

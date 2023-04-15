@@ -20,7 +20,11 @@ const countdown = require('@fedeghe/countdown');
                 textAlign: 'center',
                 paddingBottom:'10px'
             },
-            file: {cursor: 'pointer'},
+            file: {display: 'none'},
+            fileLabel: {
+                cursor:'pointer',
+                color:'blue'
+            },
             startButton: {
                 color: 'red',
                 cursor: 'pointer',
@@ -87,7 +91,8 @@ const countdown = require('@fedeghe/countdown');
             full: '100%',
             auxActivate: 'turn beeps on',
             auxDeactivate: 'turn beeps off',
-            end: 'TIME OVER'
+            end: 'TIME OVER',
+            chooseFile: 'choose a configuration file'
         },
         auxActive = true,
         configFileName = '',
@@ -103,6 +108,7 @@ const countdown = require('@fedeghe/countdown');
         
         title = create('div', { style: styles.title }),
         fileInput = create('input', { style: styles.file, attrs: { type: 'file', name: 'file', accept: '.json' } }),
+        fileLabel = create('div', { style: styles.fileLabel }),
 
         start = create('button', { style: styles.startButton }),
 
@@ -118,7 +124,7 @@ const countdown = require('@fedeghe/countdown');
         rerun = create('div', { style: styles.rerun }),
 
         views = {
-            start: [title, fileInput],
+            start: [title, fileInput, fileLabel],
             ready: [title, start, newrun],
             running: [label, progress, remaining, aux, auxTitle, progressLabel],
             end: [end, rerun, newrun]
@@ -230,6 +236,7 @@ const countdown = require('@fedeghe/countdown');
 
     title.innerHTML = labels.startTitle;
     start.innerHTML = labels.startButton;
+    fileLabel.innerHTML = labels.chooseFile;
     end.innerHTML = labels.end;
     rerun.innerHTML = '↺';
     newrun.innerHTML = 'new';
@@ -257,6 +264,9 @@ const countdown = require('@fedeghe/countdown');
         memRun();
     });
 
+    fileLabel.addEventListener('click', function () {
+        fileInput.click();
+    })
     fileInput.addEventListener('change', function (e) {
         var files = this.files,
             file, reader;
