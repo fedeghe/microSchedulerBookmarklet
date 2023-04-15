@@ -2,71 +2,72 @@ const countdown = require('@fedeghe/countdown');
 
 (function () {
     var styles = {
-        container: {
-            fontFamily: 'verdana',
-            padding: '5px',
-            backgroundColor: 'white',
-            paddingTop: '10px',
-            paddingRight: '20px',
-            borderRadius: '5px',
-            opacity: '0.7',
-            display: 'flex',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            alignItems: 'center'
-        },
-        plus: {
-            width: '20px',
-            height: '20px',
-        },
-        label: { color: 'red' },
-        progress: { accentColor: 'green', height: '20px' },
-        progressG: {
-            accentColor: '#afa',
-            height: '20px',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            fontWeight:'bold',
-            fontSize:'0.7em',
-            margin:'5px'
-        },
-        remaining: {
-            fontSize: '1em',
-            fontWeight: 'bold'
-        },
-        aux: {
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            height: '20px',
-            width: '20px',
-            cursor: 'pointer',
-            color: 'black'
-        },
+            container: {
+                fontFamily: 'verdana',
+                padding: '5px',
+                backgroundColor: 'white',
+                paddingTop: '10px',
+                paddingRight: '20px',
+                borderRadius: '5px',
+                opacity: '0.7',
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center'
+            },
+            plus: {
+                width: '20px',
+                height: '20px',
+            },
+            label: { color: 'red' },
+            progress: { accentColor: 'green', height: '20px' },
+            progressG: {
+                accentColor: '#afa',
+                height: '20px',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                fontWeight:'bold',
+                fontSize:'0.7em',
+                margin:'5px'
+            },
+            remaining: {
+                fontSize: '1em',
+                fontWeight: 'bold'
+            },
+            aux: {
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                height: '20px',
+                width: '20px',
+                cursor: 'pointer',
+                color: 'black',
+                textAlign:'center'
+            },
 
-        complete: {
-            fontWeight: 'bold',
+            complete: {
+                fontWeight: 'bold',
+            },
+            newrun: {
+                fontSize: '0.8em',
+                color: 'green',
+                cursor: 'pointer'
+            },
+            rerun: {
+                fontSize: '1.4em',
+                lineHeight: '0.8em',
+                color: 'green',
+                cursor: 'pointer'
+            },
+            auxTitle: {
+                display: 'none',
+                position: 'absolute',
+                right: '30px',
+                top: '3px',
+                fontSize: '0.8em',
+            }
         },
-        newrun: {
-            fontSize: '0.8em',
-            color: 'green',
-            cursor: 'pointer'
-        },
-        rerun: {
-            fontSize: '1.4em',
-            lineHeight: '0.8em',
-            color: 'green',
-            cursor: 'pointer'
-        },
-        auxTitle: {
-            display: 'none',
-            position: 'absolute',
-            right: '30px',
-            top: '3px',
-            fontSize: '0.8em',
-        }
-    },
         auxActive = true,
         target = document.body,
         create = function (tag, { attrs = null, style = null }) {
@@ -83,11 +84,11 @@ const countdown = require('@fedeghe/countdown');
         label = create('div', { style: styles.label }),
         progress = create('progress', { style: styles.progress, attrs: { value: 100, max: 100 } }),
         progressG = create('div', { style: styles.progressG}),
-        remaining = create('div', { style: styles.remaining });
+        remaining = create('div', { style: styles.remaining }),
 
-    end = create('div', { style: styles.complete });
-    newrun = create('div', { style: styles.newrun });
-    rerun = create('div', { style: styles.rerun }),
+        end = create('div', { style: styles.complete });
+        newrun = create('div', { style: styles.newrun });
+        rerun = create('div', { style: styles.rerun }),
         memRun = function () { },
         total = 0,
 
@@ -112,10 +113,13 @@ const countdown = require('@fedeghe/countdown');
                 return acc;
             }, {});
         },
-        remove = function (p, cs) { cs.forEach(function (c) { p.removeChild(c) }) },
+        remove = function (p, cs) {
+            cs = cs || Array.from(p.children);
+            cs.forEach(function (c) { p.removeChild(c) })
+        },
         append = function (p, cs) { cs.forEach(function (c) { p.appendChild(c) }) },
-        schedule = function (config, setters, show, complete) {
-            runSchedule(Object.entries(config), 0, setters, complete);
+        schedule = function (config, setters, show) {
+            runSchedule(Object.entries(config), 0, setters);
             show();
         },
         beep = function (d, f) {
@@ -139,7 +143,7 @@ const countdown = require('@fedeghe/countdown');
             }
         },
 
-        runSchedule = function (schedules, index, setters, complete) {
+        runSchedule = function (schedules, index, setters) {
             setTimeout(beep, 100);
             // beepn(index + 1);
 
@@ -151,7 +155,7 @@ const countdown = require('@fedeghe/countdown');
             setters.remaining(sec2time(time * 60));
             countdown(() => {
                 schedules.length > index + 1
-                    ? runSchedule(schedules, index + 1, setters, complete)
+                    ? runSchedule(schedules, index + 1, setters)
                     : complete()
             }, time * 60e3)
                 .onTick(({ progress, remaining }) => {
@@ -166,8 +170,7 @@ const countdown = require('@fedeghe/countdown');
         complete = function () {
             beep(100, 800);
             setTimeout(beep, 100)
-            remove(container, [label, progress, remaining, aux, auxTitle, progressG]);
-            append(container, [end, rerun, newrun]);
+            render('end')
         },
         setLabel = function (l) { label.innerHTML = l; },
         setProgress = function (p) { progress.setAttribute('value', p) },
@@ -179,26 +182,33 @@ const countdown = require('@fedeghe/countdown');
             .onTick(({ progress }) => {
                 setProgressG(100 - progress)
             }, 1e3).run()
+        },
+        views = {
+            start: [fileInput],
+            running: [label, progress, remaining, aux, auxTitle, progressG],
+            end: [end, rerun, newrun]
+        },
+        render = function (name){
+            if (name in views) {
+                remove(container);
+                append(container, views[name]);
+            }
         };
 
     end.innerHTML = 'TIME OVER';
     rerun.innerHTML = '↺';
     newrun.innerHTML = 'new';
     aux.innerHTML = '♪';
-    progressG.innerHTML = '100.0%';
     auxTitle.innerHTML = auxTitles[1];
 
     rerun.addEventListener('click', function _() {
-        append(container, [label, progress, remaining, aux, auxTitle, progressG]);
-        remove(container, [end, rerun, newrun]);
-        startGlobal();
+        render('running')
         memRun(true);
+        startGlobal();
     });
 
-    newrun.addEventListener('click', function _() {
-        remove(container, [end, rerun, newrun]);
-        container.appendChild(fileInput);
-    });
+    newrun.addEventListener('click', function _() {render('start');});
+
     aux.addEventListener('click', function _() {
         auxTitle.style.display = 'none'
         auxActive = !auxActive;
@@ -214,23 +224,24 @@ const countdown = require('@fedeghe/countdown');
         if (files.length) {
             file = files[0];
             reader = new FileReader();
-
             reader.addEventListener("load", function () {
                 try {
                     var j = JSON.parse(reader.result),
                         flatted = makeFlat(j);
-                    memRun = again => schedule(flatted, {
-                        label: setLabel,
-                        progress: setProgress,
-                        remaining: setRemaining
-                    }, function () { show(again); }, complete);
+                    memRun = function (again) {
+                        schedule(
+                            flatted, {
+                                label: setLabel,
+                                progress: setProgress,
+                                remaining: setRemaining
+                            },
+                            function () { show(again); }
+                        );
+                    };
                     memRun();
-
-                    //glob
-                    startGlobal()
-
+                    startGlobal();
                 } catch (e) {
-                    console.log(e)
+                    console.log('ERROR: ', e)
                 }
             }, false);
             reader.readAsText(file, "UTF-8");
@@ -239,5 +250,4 @@ const countdown = require('@fedeghe/countdown');
     });
     container.appendChild(fileInput);
     target.appendChild(container);
-
 })();
