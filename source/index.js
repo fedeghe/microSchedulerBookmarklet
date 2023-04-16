@@ -2,12 +2,6 @@ const countdown = require('@fedeghe/countdown');
 
 (function () {
     var styles = {
-            body: {
-                active: {},
-                paused : {
-                    backgroundColor: '#aaa'
-                }
-            },
             container: {
                 fontFamily: 'verdana',
                 padding: '5px',
@@ -55,7 +49,8 @@ const countdown = require('@fedeghe/countdown');
                 left: '5px',
                 fontWeight:'bold',
                 fontSize:'0.7em',
-                margin:'5px'
+                margin:'5px',
+                cursor: 'pointer'
             },
             remaining: {
                 fontSize: '1em',
@@ -191,6 +186,7 @@ const countdown = require('@fedeghe/countdown');
 
         memRun = function () { },
         total = 0,
+        totalMode = 'perc',
         status = 'playing',
 
         sec2time = function (sec) {
@@ -262,14 +258,17 @@ const countdown = require('@fedeghe/countdown');
         },
         setLabel = function (l) { label.innerHTML = l; },
         setProgress = function (p) { progress.setAttribute('value', p) },
-        setProgressLabel = function (p) { progressLabel.innerHTML = `${p.toFixed(1)}%` },
+        setProgressLabel = function (p) { progressLabel.innerHTML = p; },
         setRemaining = function (r) { remaining.innerHTML = r },
         noop = function (){},
         startGlobal = function () {
-            progressLabel.innerHTML = labels.full;
+            progressLabel.innerHTML = totalMode === 'perc' ? labels.full : sec2time(Math.ceil(total*60));
             countdowns.global = countdown(noop, total * 60e3)
-                .onTick(({ progress }) => {
-                    setProgressLabel(100 - progress)
+                .onTick(({ progress, remaining }) => {
+                    var r = totalMode === 'perc'
+                        ? `${(100-progress).toFixed(1)}%`
+                        : sec2time(Math.ceil(remaining / 1000));
+                    setProgressLabel(r)
                 }, 1e3)
                 .run()
         },
@@ -319,6 +318,10 @@ const countdown = require('@fedeghe/countdown');
     higherTooltip.innerHTML = labels.higherTooltip.beepsoff;
     lowerTooltip.innerHTML = labels.lowerTooltip.stop;
 
+    progressLabel.addEventListener('click', function _() {
+        console.log('oooo')
+        totalMode = (totalMode === 'perc') ? 'rem' : 'perc';
+    });
     rerun.addEventListener('click', function _() {
         render('running')
         startGlobal();
