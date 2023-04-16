@@ -14,7 +14,6 @@ const countdown = require('@fedeghe/countdown');
                 paddingTop: '10px',
                 paddingRight: '20px',
                 borderRadius: '5px',
-                // opacity: '0.7',
                 display: 'flex',
                 justifyContent: 'center',
                 flexDirection: 'column',
@@ -278,6 +277,14 @@ const countdown = require('@fedeghe/countdown');
             cs = cs || Array.from(p.children);
             cs.forEach(function (c) { p.removeChild(c) })
         },
+        hide = function (e, cnt) {
+            if (typeof cnt !== 'undefined') e.innerHTML = cnt;
+            e.style.display = 'none';
+        },
+        show = function (e, cnt) {
+            if (typeof cnt !== 'undefined') e.innerHTML = cnt;
+            e.style.display = 'block';
+        },
         append = function (p, cs) { cs.forEach(function (c) { p.appendChild(c) }) },
         render = function (name){
             if (name in views) {
@@ -319,13 +326,11 @@ const countdown = require('@fedeghe/countdown');
     });
     
     pauseResume.addEventListener('mouseover', function _() {
-        lowerTooltip.innerHTML = labels.lowerTooltip[status === 'playing' ? 'pause' : 'resume'];
-        lowerTooltip.style.display = 'block';
+        show(lowerTooltip, labels.lowerTooltip[status === 'playing' ? 'pause' : 'resume']);
     });
     pauseResume.addEventListener('mouseleave', function _() { lowerTooltip.style.display = 'none'; });
     pauseResume.addEventListener('click', function (){
-        lowerTooltip.style.display = 'none';
-        lowerTooltip.innerHTML = '';
+        hide(lowerTooltip, '');
         switch(status) {
             case 'playing':
                 pause();
@@ -342,22 +347,20 @@ const countdown = require('@fedeghe/countdown');
         }
     });
     breakit.addEventListener('click', function () {
-        lowerTooltip.style.display = 'none';
+        hide(lowerTooltip);
         reset()
     });
     breakit.addEventListener('mouseover', function _() {
-        lowerTooltip.innerHTML = labels.lowerTooltip.stop;
-        lowerTooltip.style.display = 'block';
+        show(lowerTooltip, labels.lowerTooltip.stop);
     });
-    breakit.addEventListener('mouseleave', function _() { lowerTooltip.style.display = 'none'; });
+    breakit.addEventListener('mouseleave', function _() { hide(lowerTooltip); });
     back.addEventListener('click', reset);
     newrun.addEventListener('click', reset);
 
     aux.addEventListener('click', function _() {
-        higherTooltip.style.display = 'none'
         auxActive = !auxActive;
+        hide(higherTooltip, labels.higherTooltip[auxActive ? 'beepsoff' : 'beepson']);
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
-        higherTooltip.innerHTML = labels.higherTooltip[auxActive ? 'beepsoff' : 'beepson'];
     });
     aux.addEventListener('mouseover', function _() { higherTooltip.style.display = 'block'; });
     aux.addEventListener('mouseleave', function _() { higherTooltip.style.display = 'none'; });
