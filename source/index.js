@@ -337,12 +337,15 @@ const countdown = require('@fedeghe/countdown');
                 status = 'paused';
                 document.body.style.backgroundColor = '#aaa';
                 pauseResume.innerHTML = labels.icons.start;
+                document.title = labels.startTitle + ' PAUSED';
+
                 break;
             case 'paused':
                 resume();
                 status = 'playing';
                 document.body.style.backgroundColor = '#fff';
                 pauseResume.innerHTML = labels.icons.pause;
+                document.title = labels.startTitle + ' RUNNING';
                 break;
         }
     });
