@@ -90,8 +90,8 @@ const countdown = require('@fedeghe/countdown');
                 display: 'none',
                 position: 'absolute',
                 right: '30px',
-                top: '8px',
-                fontSize: '0.8em',
+                top: '6px',
+                fontSize: '0.6em',
             },
             breakit: {
                 position: 'absolute',
