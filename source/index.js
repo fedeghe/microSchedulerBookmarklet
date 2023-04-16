@@ -57,16 +57,7 @@ const countdown = require('@fedeghe/countdown');
                 fontSize: '1em',
                 fontWeight: 'bold'
             },
-            aux: {
-                position: 'absolute',
-                right: '5px',
-                top: '5px',
-                height: '20px',
-                width: '20px',
-                cursor: 'pointer',
-                color: 'black',
-                textAlign:'center'
-            },
+           
 
             complete: {
                 fontWeight: 'bold',
@@ -93,6 +84,23 @@ const countdown = require('@fedeghe/countdown');
                 top: '6px',
                 fontSize: '0.6em',
             },
+            aux: {
+                position: 'absolute',
+                right: '5px',
+                top: '5px',
+                height: '20px',
+                width: '20px',
+                cursor: 'pointer',
+                color: 'black',
+                textAlign:'center'
+            },
+            breakTitle: {
+                display: 'none',
+                position: 'absolute',
+                right: '30px',
+                bottom: '6px',
+                fontSize: '0.6em',
+            },
             breakit: {
                 position: 'absolute',
                 right: '5px',
@@ -113,6 +121,7 @@ const countdown = require('@fedeghe/countdown');
             auxDeactivate: 'turn beeps off',
             end: 'TIME OVER',
             stop: '⏹︎',
+            stopTitle: 'stop the countdown',
             chooseFile: 'choose a configuration file'
         },
         auxActive = true,
@@ -140,6 +149,7 @@ const countdown = require('@fedeghe/countdown');
         progressLabel = create('div', { style: styles.progressLabel}),
         remaining = create('div', { style: styles.remaining }),
         breakit = create('div', { style: styles.breakit }),
+        breakTitle = create('div', { style: styles.breakTitle }),
 
         end = create('div', { style: styles.complete }),
         newrun = create('div', { style: styles.newrun }),
@@ -149,7 +159,7 @@ const countdown = require('@fedeghe/countdown');
         views = {
             start: [title, fileInput, selectFileLabel],
             ready: [title, start, back],
-            running: [label, progress, remaining, aux, auxTitle, progressLabel, breakit],
+            running: [label, progress, remaining, aux, auxTitle, progressLabel, breakit, breakTitle],
             end: [end, rerun, newrun]
         },
         countdowns = {inner: null, global: null},
@@ -268,6 +278,7 @@ const countdown = require('@fedeghe/countdown');
     back.innerHTML = '←';
     aux.innerHTML = '♪';
     auxTitle.innerHTML = labels.auxDeactivate;
+    breakTitle.innerHTML = labels.stopTitle;
 
     rerun.addEventListener('click', function _() {
         render('running')
@@ -276,6 +287,8 @@ const countdown = require('@fedeghe/countdown');
     });
     
     breakit.addEventListener('click', reset);
+    breakit.addEventListener('mouseover', function _() { breakTitle.style.display = 'block'; });
+    breakit.addEventListener('mouseleave', function _() { breakTitle.style.display = 'none'; });
     back.addEventListener('click', reset);
     newrun.addEventListener('click', reset);
 
