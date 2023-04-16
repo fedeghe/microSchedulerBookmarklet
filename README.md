@@ -44,6 +44,7 @@ there one can see
 - the overall progress in the upper left corner
 - the current section progress
 - a `♪` icon to turn on/off the beeps that will be produced on each transition and at the end.   
+- a toggler `⏸︎` & `⏵` icon to pause/resume the execution.
 - a `⏹︎` icon to stop the execution and go back to the file selection.
 
 When the time is over one can either rerun either run a new one.
