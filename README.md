@@ -41,7 +41,7 @@ hit the `⏵` icon and the sheduler starts:
 ![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_running.png "the end")
 
 there one can see
-- the overall progress in the upper left corner
+- the overall progress in the upper left corner (click to toggle from percentage to remanining time)
 - the current section progress
 - a `♪` icon to turn on/off the beeps that will be produced on each transition and at the end.   
 - a toggler `⏸︎` & `⏵` icon to pause/resume the execution.
