@@ -328,7 +328,7 @@ const countdown = require('@fedeghe/countdown');
     pauseResume.addEventListener('mouseover', function _() {
         show(lowerTooltip, labels.lowerTooltip[status === 'playing' ? 'pause' : 'resume']);
     });
-    pauseResume.addEventListener('mouseleave', function _() { lowerTooltip.style.display = 'none'; });
+    pauseResume.addEventListener('mouseleave', function _() { hide(lowerTooltip); });
     pauseResume.addEventListener('click', function (){
         hide(lowerTooltip, '');
         switch(status) {
@@ -365,8 +365,8 @@ const countdown = require('@fedeghe/countdown');
         hide(higherTooltip, labels.higherTooltip[auxActive ? 'beepsoff' : 'beepson']);
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
     });
-    aux.addEventListener('mouseover', function _() { higherTooltip.style.display = 'block'; });
-    aux.addEventListener('mouseleave', function _() { higherTooltip.style.display = 'none'; });
+    aux.addEventListener('mouseover', function _() { show(hhigherTooltip); });
+    aux.addEventListener('mouseleave', function _() { hide(higherTooltip); });
     start.addEventListener('click', function _() { 
         startGlobal();
         memRun();
@@ -388,13 +388,12 @@ const countdown = require('@fedeghe/countdown');
                     var j = JSON.parse(reader.result),
                         flatted = makeFlat(j);
                     memRun = function () {
-                        
-                        render('running')
+                        render('running');
                         runSchedule(Object.entries(flatted), 0);
                     };
                     render('ready');
                 } catch (e) {
-                    console.log('ERROR: ', e)
+                    console.log('ERROR: ', e);
                 }
             }, false);
             reader.readAsText(file, "UTF-8");
@@ -403,5 +402,5 @@ const countdown = require('@fedeghe/countdown');
     });
 
     target.appendChild(container);
-    render('start')
+    render('start');
 })();
