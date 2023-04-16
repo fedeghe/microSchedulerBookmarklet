@@ -29,7 +29,7 @@ const countdown = require('@fedeghe/countdown');
                 backgroundColor: 'red',
                 cursor: 'pointer',
                 fontSize:'1.2em',
-                lineHeight:'1.2em',
+                lineHeight:'1.1em',
                 height:'1.2em',
                 width:'1.2em',
                 borderRadius: '0.6em',
