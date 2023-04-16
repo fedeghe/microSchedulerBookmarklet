@@ -28,14 +28,29 @@ javascript:void%20function(){window.open('https%3A%2F%2Ffedeghe.github.io%2Fmicr
 ```
 and name it as u like.
 
-Now when the meeting starts, click the bookmarklet, select the right config json and 
+Now when the meeting starts, click the bookmarklet
 
-![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_start.png "started")
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_start.png "started") 
 
-there one can see the overall progress in the upper left corner, the section progress and a `♪` icon to turn on/off the beeps that will be produced on each transition and at the end.   
-Then when everything is over You have to option to rerun or run a new one.
+ select the right config json and 
+
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_selected.png "started")
+
+hit the `⏵` icon and the sheduler starts:
+
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_running.png "the end")
+
+there one can see
+- the overall progress in the upper left corner
+- the current section progress
+- a `♪` icon to turn on/off the beeps that will be produced on each transition and at the end.   
+- a `⏹︎` icon to stop the execution and go back to the file selection.
+
+When the time is over one can either rerun either run a new one.
 
 ![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_end.png "the end")
+
+---
 
 
 
