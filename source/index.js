@@ -9,7 +9,7 @@ const countdown = require('@fedeghe/countdown');
                 paddingTop: '10px',
                 paddingRight: '20px',
                 borderRadius: '5px',
-                opacity: '0.7',
+                // opacity: '0.7',
                 display: 'flex',
                 justifyContent: 'center',
                 flexDirection: 'column',
@@ -21,14 +21,21 @@ const countdown = require('@fedeghe/countdown');
                 paddingBottom:'10px'
             },
             file: {display: 'none'},
-            fileLabel: {
+            selectFileLabel: {
                 cursor:'pointer',
-                color:'blue'
+                color:'blue',
+                fontSize: '0.8em'
             },
             startButton: {
-                color: 'red',
+                color: 'white',
+                backgroundColor: 'red',
                 cursor: 'pointer',
-                fontSize:'1.2em'
+                fontSize:'1.2em',
+                lineHeight:'1.2em',
+                height:'1.2em',
+                width:'1.2em',
+                borderRadius: '0.6em',
+                textAlign:'center'
             },
             plus: {
                 width: '20px',
@@ -64,6 +71,9 @@ const countdown = require('@fedeghe/countdown');
             complete: {
                 fontWeight: 'bold',
             },
+            back: {
+                cursor:'pointer'
+            },
             newrun: {
                 paddingTop:'5px',
                 fontSize: '0.8em',
@@ -82,16 +92,27 @@ const countdown = require('@fedeghe/countdown');
                 right: '30px',
                 top: '3px',
                 fontSize: '0.8em',
+            },
+            breakit: {
+                position: 'absolute',
+                right: '0px',
+                bottom: '0px',
+                cursor:'pointer',
+                width:'20px',
+                height:'20px',
+                lineHeight:'20px',
+                textAlign:'center'
             }
         },
         labels = {
             startTitle: 'Scheduler',
-            startButton: 'start',
+            startButton: '⏵',
             startSelection: 'selected file',
-            full: '100%',
+            full: '100.0%',
             auxActivate: 'turn beeps on',
             auxDeactivate: 'turn beeps off',
             end: 'TIME OVER',
+            stop: '⏹︎',
             chooseFile: 'choose a configuration file'
         },
         auxActive = true,
@@ -108,9 +129,9 @@ const countdown = require('@fedeghe/countdown');
         
         title = create('div', { style: styles.title }),
         fileInput = create('input', { style: styles.file, attrs: { type: 'file', name: 'file', accept: '.json' } }),
-        fileLabel = create('div', { style: styles.fileLabel }),
+        selectFileLabel = create('div', { style: styles.selectFileLabel }),
 
-        start = create('button', { style: styles.startButton }),
+        start = create('div', { style: styles.startButton }),
 
         aux = create('div', { style: styles.aux }),
         auxTitle = create('div', { style: styles.auxTitle }),
@@ -118,17 +139,20 @@ const countdown = require('@fedeghe/countdown');
         progress = create('progress', { style: styles.progress, attrs: { value: 100, max: 100 } }),
         progressLabel = create('div', { style: styles.progressLabel}),
         remaining = create('div', { style: styles.remaining }),
+        breakit = create('div', { style: styles.breakit }),
 
         end = create('div', { style: styles.complete }),
         newrun = create('div', { style: styles.newrun }),
+        back = create('div', { style: styles.back }),
         rerun = create('div', { style: styles.rerun }),
 
         views = {
-            start: [title, fileInput, fileLabel],
-            ready: [title, start, newrun],
-            running: [label, progress, remaining, aux, auxTitle, progressLabel],
+            start: [title, fileInput, selectFileLabel],
+            ready: [title, start, back],
+            running: [label, progress, remaining, aux, auxTitle, progressLabel, breakit],
             end: [end, rerun, newrun]
         },
+        countdowns = {inner: null, global: null},
 
         memRun = function () { },
         total = 0,
@@ -139,6 +163,7 @@ const countdown = require('@fedeghe/countdown');
                 s = ~~(sec % 60);
             return `${h}h ${m}m ${s}s`;
         },
+        
         makeFlat = function (j, key) {
             key = key || '';
             const isObject = obj => obj != null && obj.constructor.name === "Object";
@@ -155,10 +180,7 @@ const countdown = require('@fedeghe/countdown');
             }, {});
         },
         
-        schedule = function (config, setters, show) {
-            runSchedule(Object.entries(config), 0, setters);
-            show();
-        },
+        
         beep = function (d, f) {
             if (!auxActive) return;
             d = d || 100;
@@ -179,31 +201,25 @@ const countdown = require('@fedeghe/countdown');
                 setTimeout(beep, 100 * i + 10);
             }
         },
-
-        runSchedule = function (schedules, index, setters) {
+        runSchedule = function (schedules, index) {
             setTimeout(beep, 100);
             // beepn(index + 1);
 
             var label = schedules[index][0],
                 time = schedules[index][1];
 
-            setters.label(label);
-            setters.progress(1000);
-            setters.remaining(sec2time(time * 60));
-            countdown(() => {
+            setLabel(label);
+            setProgress(1000);
+            setRemaining(sec2time(time * 60));
+            countdowns.inner = countdown(() => {
                 schedules.length > index + 1
-                    ? runSchedule(schedules, index + 1, setters)
+                    ? runSchedule(schedules, index + 1)
                     : complete()
             }, time * 60e3)
                 .onTick(({ progress, remaining }) => {
-                    setters.progress(100 - progress)
-                    setters.remaining(sec2time(Math.ceil(remaining / 1000)))
+                    setProgress(100 - progress)
+                    setRemaining(sec2time(Math.ceil(remaining / 1000)))
                 }, 1e3).run()
-        },
-        show = function (fi) {
-            // append(container, [label, progress, remaining, aux, auxTitle, progressLabel]);
-            render('running')
-            !fi && container.removeChild(fileInput);
         },
         complete = function () {
             beep(100, 800);
@@ -214,9 +230,10 @@ const countdown = require('@fedeghe/countdown');
         setProgress = function (p) { progress.setAttribute('value', p) },
         setProgressLabel = function (p) { progressLabel.innerHTML = `${p.toFixed(1)}%` },
         setRemaining = function (r) { remaining.innerHTML = r },
+        noop = function (){},
         startGlobal = function () {
             progressLabel.innerHTML = labels.full;
-            countdown(() => {}, total * 60e3)
+            countdowns.global = countdown(noop, total * 60e3)
                 .onTick(({ progress }) => {
                     setProgressLabel(100 - progress)
                 }, 1e3)
@@ -232,24 +249,35 @@ const countdown = require('@fedeghe/countdown');
                 remove(container);
                 append(container, views[name]);
             }
+        },
+        reset = function _() {total = 0; closeCountdowns(); render('start');},
+        closeCountdowns = function () {
+            countdowns.inner && countdowns.inner.end();
+            countdowns.global && countdowns.global.end();
+            delete countdowns.inner;
+            delete countdowns.global;
         };
 
     title.innerHTML = labels.startTitle;
     start.innerHTML = labels.startButton;
-    fileLabel.innerHTML = labels.chooseFile;
+    selectFileLabel.innerHTML = labels.chooseFile;
     end.innerHTML = labels.end;
+    breakit.innerHTML = labels.stop;
     rerun.innerHTML = '↺';
     newrun.innerHTML = 'new';
+    back.innerHTML = '←';
     aux.innerHTML = '♪';
     auxTitle.innerHTML = labels.auxDeactivate;
 
     rerun.addEventListener('click', function _() {
         render('running')
-        memRun(true);
         startGlobal();
+        memRun();
     });
-
-    newrun.addEventListener('click', function _() {render('start');});
+    
+    breakit.addEventListener('click', reset);
+    back.addEventListener('click', reset);
+    newrun.addEventListener('click', reset);
 
     aux.addEventListener('click', function _() {
         auxTitle.style.display = 'none'
@@ -264,7 +292,7 @@ const countdown = require('@fedeghe/countdown');
         memRun();
     });
 
-    fileLabel.addEventListener('click', function () {
+    selectFileLabel.addEventListener('click', function () {
         fileInput.click();
     })
     fileInput.addEventListener('change', function (e) {
@@ -279,15 +307,10 @@ const countdown = require('@fedeghe/countdown');
                 try {
                     var j = JSON.parse(reader.result),
                         flatted = makeFlat(j);
-                    memRun = function (again) {
-                        schedule(
-                            flatted, {
-                                label: setLabel,
-                                progress: setProgress,
-                                remaining: setRemaining
-                            },
-                            function () { show(again); }
-                        );
+                    memRun = function () {
+                        
+                        render('running')
+                        runSchedule(Object.entries(flatted), 0);
                     };
                     render('ready');
                 } catch (e) {
