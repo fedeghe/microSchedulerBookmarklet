@@ -2,10 +2,15 @@ const countdown = require('@fedeghe/countdown');
 
 (function () {
     var styles = {
+            body: {
+                active: {},
+                paused : {
+                    backgroundColor: '#aaa'
+                }
+            },
             container: {
                 fontFamily: 'verdana',
                 padding: '5px',
-                backgroundColor: 'white',
                 paddingTop: '10px',
                 paddingRight: '20px',
                 borderRadius: '5px',
@@ -77,7 +82,7 @@ const countdown = require('@fedeghe/countdown');
                 color: 'green',
                 cursor: 'pointer'
             },
-            auxTitle: {
+            higherTooltip: {
                 display: 'none',
                 position: 'absolute',
                 right: '30px',
@@ -94,10 +99,10 @@ const countdown = require('@fedeghe/countdown');
                 color: 'black',
                 textAlign:'center'
             },
-            breakTitle: {
+            lowerTooltip: {
                 display: 'none',
                 position: 'absolute',
-                right: '30px',
+                right: '50px',
                 bottom: '6px',
                 fontSize: '0.6em',
             },
@@ -110,19 +115,38 @@ const countdown = require('@fedeghe/countdown');
                 height:'20px',
                 lineHeight:'20px',
                 textAlign:'center'
+            },
+            pauseResume: {
+                position: 'absolute',
+                right: '25px',
+                bottom: '5px',
+                cursor:'pointer',
+                width:'20px',
+                height:'20px',
+                lineHeight:'20px',
+                textAlign:'center'
             }
         },
         labels = {
             startTitle: 'Scheduler',
-            startButton: '⏵',
             startSelection: 'selected file',
             full: '100.0%',
-            auxActivate: 'turn beeps on',
-            auxDeactivate: 'turn beeps off',
             end: 'TIME OVER',
-            stop: '⏹︎',
-            stopTitle: 'stop the countdown',
-            chooseFile: 'choose a configuration file'
+            chooseFile: 'choose a configuration file',
+            icons: {
+                start: '⏵',
+                stop: '⏹︎',
+                pause: '⏸︎',
+            },
+            higherTooltip: {
+                beepson: 'turn beeps on',
+                beepsoff: 'turn beeps off',
+            },
+            lowerTooltip: {
+                stop:'stop the countdown',
+                pause:'pause the countdown',
+                resume: 'resume the countdown',
+            }
         },
         auxActive = true,
         configFileName = '',
@@ -143,13 +167,15 @@ const countdown = require('@fedeghe/countdown');
         start = create('div', { style: styles.startButton }),
 
         aux = create('div', { style: styles.aux }),
-        auxTitle = create('div', { style: styles.auxTitle }),
+        breakit = create('div', { style: styles.breakit }),
+        pauseResume = create('div', { style: styles.pauseResume }),
+        higherTooltip = create('div', { style: styles.higherTooltip }),
+        lowerTooltip = create('div', { style: styles.lowerTooltip }),
         label = create('div', { style: styles.label }),
         progress = create('progress', { style: styles.progress, attrs: { value: 100, max: 100 } }),
         progressLabel = create('div', { style: styles.progressLabel}),
         remaining = create('div', { style: styles.remaining }),
-        breakit = create('div', { style: styles.breakit }),
-        breakTitle = create('div', { style: styles.breakTitle }),
+        
 
         end = create('div', { style: styles.complete }),
         newrun = create('div', { style: styles.newrun }),
@@ -159,13 +185,14 @@ const countdown = require('@fedeghe/countdown');
         views = {
             start: [title, fileInput, selectFileLabel],
             ready: [title, start, back],
-            running: [label, progress, remaining, aux, auxTitle, progressLabel, breakit, breakTitle],
+            running: [label, progress, remaining, aux, higherTooltip, progressLabel, breakit, lowerTooltip, pauseResume],
             end: [end, rerun, newrun]
         },
         countdowns = {inner: null, global: null},
 
         memRun = function () { },
         total = 0,
+        status = 'playing',
 
         sec2time = function (sec) {
             var h = ~~(sec / 3600),
@@ -176,6 +203,7 @@ const countdown = require('@fedeghe/countdown');
         
         makeFlat = function (j, key) {
             key = key || '';
+            total = 0;
             const isObject = obj => obj != null && obj.constructor.name === "Object";
             return Object.entries(j).reduce((acc, [k, v]) => {
                 const deep = isObject(v),
@@ -190,7 +218,6 @@ const countdown = require('@fedeghe/countdown');
             }, {});
         },
         
-        
         beep = function (d, f) {
             if (!auxActive) return;
             d = d || 100;
@@ -200,7 +227,6 @@ const countdown = require('@fedeghe/countdown');
             oscillator.type = "sine";
             oscillator.frequency.value = f;
             oscillator.connect(context.destination);
-
             oscillator.start();
             setTimeout(function () {
                 oscillator.stop();
@@ -214,7 +240,6 @@ const countdown = require('@fedeghe/countdown');
         runSchedule = function (schedules, index) {
             setTimeout(beep, 100);
             // beepn(index + 1);
-
             var label = schedules[index][0],
                 time = schedules[index][1];
 
@@ -233,8 +258,8 @@ const countdown = require('@fedeghe/countdown');
         },
         complete = function () {
             beep(100, 800);
-            setTimeout(beep, 100)
-            render('end')
+            setTimeout(beep, 100);
+            render('end');
         },
         setLabel = function (l) { label.innerHTML = l; },
         setProgress = function (p) { progress.setAttribute('value', p) },
@@ -260,25 +285,32 @@ const countdown = require('@fedeghe/countdown');
                 append(container, views[name]);
             }
         },
-        reset = function _() {total = 0; closeCountdowns(); render('start');},
+        reset = function _() {closeCountdowns(); render('start');},
+        pause = function (){
+            countdowns.inner && countdowns.inner.pause();
+            countdowns.global && countdowns.global.pause();
+        },
+        resume = function (){
+            countdowns.inner && countdowns.inner.resume();
+            countdowns.global && countdowns.global.resume();
+        },
         closeCountdowns = function () {
             countdowns.inner && countdowns.inner.end();
             countdowns.global && countdowns.global.end();
-            delete countdowns.inner;
-            delete countdowns.global;
         };
 
     title.innerHTML = labels.startTitle;
-    start.innerHTML = labels.startButton;
+    start.innerHTML = labels.icons.start;
     selectFileLabel.innerHTML = labels.chooseFile;
     end.innerHTML = labels.end;
-    breakit.innerHTML = labels.stop;
+    breakit.innerHTML = labels.icons.stop;
     rerun.innerHTML = '↺';
     newrun.innerHTML = 'new';
     back.innerHTML = '←';
     aux.innerHTML = '♪';
-    auxTitle.innerHTML = labels.auxDeactivate;
-    breakTitle.innerHTML = labels.stopTitle;
+    pauseResume.innerHTML = labels.icons.pause;
+    higherTooltip.innerHTML = labels.higherTooltip.beepsoff;
+    lowerTooltip.innerHTML = labels.lowerTooltip.stop;
 
     rerun.addEventListener('click', function _() {
         render('running')
@@ -286,20 +318,49 @@ const countdown = require('@fedeghe/countdown');
         memRun();
     });
     
-    breakit.addEventListener('click', reset);
-    breakit.addEventListener('mouseover', function _() { breakTitle.style.display = 'block'; });
-    breakit.addEventListener('mouseleave', function _() { breakTitle.style.display = 'none'; });
+    pauseResume.addEventListener('mouseover', function _() {
+        lowerTooltip.innerHTML = labels.lowerTooltip[status === 'playing' ? 'pause' : 'resume'];
+        lowerTooltip.style.display = 'block';
+    });
+    pauseResume.addEventListener('mouseleave', function _() { lowerTooltip.style.display = 'none'; });
+    pauseResume.addEventListener('click', function (){
+        lowerTooltip.style.display = 'none';
+        lowerTooltip.innerHTML = '';
+        switch(status) {
+            case 'playing':
+                pause();
+                status = 'paused';
+                document.body.style.backgroundColor = '#aaa';
+                pauseResume.innerHTML = labels.icons.start;
+                break;
+            case 'paused':
+                resume();
+                status = 'playing';
+                document.body.style.backgroundColor = '#fff';
+                pauseResume.innerHTML = labels.icons.pause;
+                break;
+        }
+    });
+    breakit.addEventListener('click', function () {
+        lowerTooltip.style.display = 'none';
+        reset()
+    });
+    breakit.addEventListener('mouseover', function _() {
+        lowerTooltip.innerHTML = labels.lowerTooltip.stop;
+        lowerTooltip.style.display = 'block';
+    });
+    breakit.addEventListener('mouseleave', function _() { lowerTooltip.style.display = 'none'; });
     back.addEventListener('click', reset);
     newrun.addEventListener('click', reset);
 
     aux.addEventListener('click', function _() {
-        auxTitle.style.display = 'none'
+        higherTooltip.style.display = 'none'
         auxActive = !auxActive;
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
-        auxTitle.innerHTML = labels[auxActive ? 'auxDeactivate' : 'auxActivate'];
+        higherTooltip.innerHTML = labels.higherTooltip[auxActive ? 'beepsoff' : 'beepson'];
     });
-    aux.addEventListener('mouseover', function _() { auxTitle.style.display = 'block'; });
-    aux.addEventListener('mouseleave', function _() { auxTitle.style.display = 'none'; });
+    aux.addEventListener('mouseover', function _() { higherTooltip.style.display = 'block'; });
+    aux.addEventListener('mouseleave', function _() { higherTooltip.style.display = 'none'; });
     start.addEventListener('click', function _() { 
         startGlobal();
         memRun();
