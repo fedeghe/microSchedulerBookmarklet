@@ -36,9 +36,9 @@ Now when the meeting starts, click the bookmarklet
 
 ![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_selected.png "started")
 
-hit the `⏵` icon and the sheduler starts:
+hit the `⏵` icon and the scheduler starts:
 
-![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_running.png "the end")
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_running2.png "the end")
 
 there one can see
 - the overall progress in the upper left corner (click to toggle from percentage to remanining time)
