@@ -179,7 +179,9 @@ const countdown = require('@fedeghe/countdown');
         views = {
             start: [title, fileInput, selectFileLabel],
             ready: [title, start, back],
-            running: [label, progress, remaining, aux, higherTooltip, progressLabel, breakit, lowerTooltip, pauseResume],
+            running: [label, progress, remaining, aux, higherTooltip, progressLabel, breakit, lowerTooltip
+                // , pauseResume
+            ],
             end: [end, rerun, newrun]
         },
         countdowns = {inner: null, global: null},
@@ -239,7 +241,7 @@ const countdown = require('@fedeghe/countdown');
                 time = schedules[index][1];
 
             setLabel(label);
-            setProgress(1000);
+            setProgress(100);
             setRemaining(sec2time(time * 60));
             countdowns.inner = countdown(() => {
                 schedules.length > index + 1
@@ -247,6 +249,7 @@ const countdown = require('@fedeghe/countdown');
                     : complete()
             }, time * 60e3)
                 .onTick(({ progress, remaining }) => {
+                    // console.log('local tick', {progress, remaining})
                     setProgress(100 - progress)
                     setRemaining(sec2time(Math.ceil(remaining / 1000)))
                 }, 1e3).run()
@@ -262,9 +265,11 @@ const countdown = require('@fedeghe/countdown');
         setRemaining = function (r) { remaining.innerHTML = r },
         noop = function (){},
         startGlobal = function () {
+            console.log({total})
             progressLabel.innerHTML = totalMode === 'perc' ? labels.full : sec2time(Math.ceil(total*60));
             countdowns.global = countdown(noop, total * 60e3)
                 .onTick(({ progress, remaining }) => {
+                    console.log('global tick ', {progress, remaining})
                     var r = totalMode === 'perc'
                         ? `${(100-progress).toFixed(1)}%`
                         : sec2time(Math.ceil(remaining / 1000));
@@ -319,11 +324,9 @@ const countdown = require('@fedeghe/countdown');
     lowerTooltip.innerHTML = labels.lowerTooltip.stop;
 
     progressLabel.addEventListener('click', function _() {
-        console.log('oooo')
         totalMode = (totalMode === 'perc') ? 'rem' : 'perc';
     });
     rerun.addEventListener('click', function _() {
-        render('running')
         startGlobal();
         memRun();
     });
