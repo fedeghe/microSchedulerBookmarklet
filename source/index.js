@@ -1,4 +1,5 @@
-const countdown = require('@fedeghe/countdown');
+// const countdown = require('@fedeghe/countdown');
+const countdown = require('./../../countdown/dist');
 
 (function () {
     var styles = {
@@ -169,7 +170,6 @@ const countdown = require('@fedeghe/countdown');
         progress = create('progress', { style: styles.progress, attrs: { value: 100, max: 100 } }),
         progressLabel = create('div', { style: styles.progressLabel}),
         remaining = create('div', { style: styles.remaining }),
-        
 
         end = create('div', { style: styles.complete }),
         newrun = create('div', { style: styles.newrun }),
@@ -179,9 +179,7 @@ const countdown = require('@fedeghe/countdown');
         views = {
             start: [title, fileInput, selectFileLabel],
             ready: [title, start, back],
-            running: [label, progress, remaining, aux, higherTooltip, progressLabel, breakit, lowerTooltip
-                // , pauseResume
-            ],
+            running: [label, progress, remaining, aux, higherTooltip, progressLabel, breakit, lowerTooltip, pauseResume],
             end: [end, rerun, newrun]
         },
         countdowns = {inner: null, global: null},
@@ -238,21 +236,31 @@ const countdown = require('@fedeghe/countdown');
             setTimeout(beep, 100);
             // beepn(index + 1);
             var label = schedules[index][0],
-                time = schedules[index][1];
+                time = schedules[index][1],
+                getEndingFunction  = function (){
+                    return status === 'ended'
+                        ? complete
+                        : function(){
+                            schedules.length > index + 1
+                                ? runSchedule(schedules, index + 1)
+                                : complete()
+                        }
+                };
 
             setLabel(label);
             setProgress(100);
             setRemaining(sec2time(time * 60));
             countdowns.inner = countdown(() => {
-                schedules.length > index + 1
-                    ? runSchedule(schedules, index + 1)
-                    : complete()
-            }, time * 60e3)
-                .onTick(({ progress, remaining }) => {
-                    // console.log('local tick', {progress, remaining})
-                    setProgress(100 - progress)
-                    setRemaining(sec2time(Math.ceil(remaining / 1000)))
-                }, 1e3).run()
+                        getEndingFunction()();
+                    },
+                    time * 60e3,
+                    ({ progress, remaining }) => {
+                        console.log('local tick', {progress, remaining})
+                        setProgress(100 - progress)
+                        setRemaining(sec2time(Math.ceil(remaining / 1000)))
+                    },
+                    1e3
+                ).run()
         },
         complete = function () {
             beep(100, 800);
@@ -267,28 +275,31 @@ const countdown = require('@fedeghe/countdown');
         startGlobal = function () {
             console.log({total})
             progressLabel.innerHTML = totalMode === 'perc' ? labels.full : sec2time(Math.ceil(total*60));
-            countdowns.global = countdown(noop, total * 60e3)
-                .onTick(({ progress, remaining }) => {
-                    console.log('global tick ', {progress, remaining})
-                    var r = totalMode === 'perc'
-                        ? `${(100-progress).toFixed(1)}%`
-                        : sec2time(Math.ceil(remaining / 1000));
-                    setProgressLabel(r)
-                }, 1e3)
+            countdowns.global = countdown(() => {
+                        console.log('global ended ', +new Date)
+                    },
+                    total * 60e3,
+                    ({ progress, remaining }) => {
+                        console.log('global tick ', {progress, remaining})
+                        var r = totalMode === 'perc'
+                            ? `${(100-progress).toFixed(1)}%`
+                            : sec2time(Math.ceil(remaining / 1000));
+                        setProgressLabel(r)
+                    },
+                    1e3
+                )
                 .run()
         },
         remove = function (p, cs) {
             cs = cs || Array.from(p.children);
             cs.forEach(function (c) { p.removeChild(c) })
         },
-        hide = function (e, cnt) {
+        toggle = function (e, cnt, vis) {
             if (typeof cnt !== 'undefined') e.innerHTML = cnt;
-            e.style.display = 'none';
+            e.style.display = vis ? 'block' : 'none';
         },
-        show = function (e, cnt) {
-            if (typeof cnt !== 'undefined') e.innerHTML = cnt;
-            e.style.display = 'block';
-        },
+        hide = function (e, cnt) { toggle(e, cnt, false); },
+        show = function (e, cnt) { toggle(e, cnt, true); },
         append = function (p, cs) { cs.forEach(function (c) { p.appendChild(c) }) },
         render = function (name){
             if (name in views) {
@@ -296,16 +307,22 @@ const countdown = require('@fedeghe/countdown');
                 append(container, views[name]);
             }
         },
-        reset = function _() {closeCountdowns(); render('start');},
+        reset = function _() {
+            document.body.style.backgroundColor = '#fff';
+            closeCountdowns();
+            status = 'playing';
+            render('start');
+        },
         pause = function (){
-            countdowns.inner && countdowns.inner.pause();
-            countdowns.global && countdowns.global.pause();
+            countdowns.inner && countdowns.inner.pause(true);
+            countdowns.global && countdowns.global.pause(true);
         },
         resume = function (){
             countdowns.inner && countdowns.inner.resume();
             countdowns.global && countdowns.global.resume();
         },
         closeCountdowns = function () {
+            status = 'ended';
             countdowns.inner && countdowns.inner.end();
             countdowns.global && countdowns.global.end();
         };
@@ -371,7 +388,7 @@ const countdown = require('@fedeghe/countdown');
         hide(higherTooltip, labels.higherTooltip[auxActive ? 'beepsoff' : 'beepson']);
         aux.style.color = auxActive ? styles.aux.color : '#aaa';
     });
-    aux.addEventListener('mouseover', function _() { show(hhigherTooltip); });
+    aux.addEventListener('mouseover', function _() { show(higherTooltip); });
     aux.addEventListener('mouseleave', function _() { hide(higherTooltip); });
     start.addEventListener('click', function _() { 
         startGlobal();
