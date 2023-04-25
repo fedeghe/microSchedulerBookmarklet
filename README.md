@@ -38,13 +38,14 @@ Now when the meeting starts, click the bookmarklet
 
 hit the `⏵` icon and the scheduler starts:
 
-![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_running2.png "the end")
+![Alt text](https://github.com/fedeghe/microSchedulerBookmarklet/raw/master/source/s_running.png "the end")
 
 there one can see
 - the overall progress in the upper left corner (click to toggle from percentage to remanining time)
 - the current section progress
 - a `♪` icon to turn on/off the beeps that will be produced on each transition and at the end.   
-- a `⏹︎` icon to stop the execution and go back to the file selection.
+- a `⏸︎` to pause/resume the execution.
+- a `⏹︎` icon stop the execution and go back to the file selection.
 
 When the time is over one can either rerun either run a new one.
 
