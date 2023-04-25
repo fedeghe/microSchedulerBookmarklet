@@ -943,10 +943,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@fedeghe/countdown@^0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@fedeghe/countdown/-/countdown-0.0.15.tgz#76122298aabb2bef6b094bf92bf412d04bd2880a"
-  integrity sha512-cfwee/GPHod8rHLXYqQqXyQRn/az43crWKKP5FKL8VwfRBsrgTnAaultA1Bi64HVYWkxrpWQyFx8wbsC+DiULg==
+"@fedeghe/countdown@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@fedeghe/countdown/-/countdown-0.0.16.tgz#cb704fdd609052eb5527d8a710189617ce8e8f61"
+  integrity sha512-Lucku0B9BduBAh3Ol33j8nRFqweWBpt/BHTT2vn5yBVUgAdzv61K6U3303aCMJsFliDVZlYKm5OHNxtSOWpcGg==
   dependencies:
     "@fedeghe/interval" "^1.0.37"
 

@@ -4,7 +4,7 @@
     "main": "index.js",
     "license": "MIT",
     "dependencies": {
-        "@fedeghe/countdown": "^0.0.15"
+        "@fedeghe/countdown": "^0.0.16"
     },
     "devDependencies": {
         "malta": "^4.1.36",
