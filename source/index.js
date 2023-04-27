@@ -255,7 +255,6 @@ const countdown = require('./../../countdown/dist');
                     },
                     time * 60e3,
                     ({ progress, remaining }) => {
-                        console.log('local tick', {progress, remaining})
                         setProgress(100 - progress)
                         setRemaining(sec2time(Math.ceil(remaining / 1000)))
                     },
@@ -275,12 +274,10 @@ const countdown = require('./../../countdown/dist');
         startGlobal = function () {
             console.log({total})
             progressLabel.innerHTML = totalMode === 'perc' ? labels.full : sec2time(Math.ceil(total*60));
-            countdowns.global = countdown(() => {
-                        console.log('global ended ', +new Date)
-                    },
+            countdowns.global = countdown(
+                    () => { /* console.log('global ended ', +new Date)*/ },
                     total * 60e3,
                     ({ progress, remaining }) => {
-                        console.log('global tick ', {progress, remaining})
                         var r = totalMode === 'perc'
                             ? `${(100-progress).toFixed(1)}%`
                             : sec2time(Math.ceil(remaining / 1000));
